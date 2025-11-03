@@ -17,7 +17,7 @@ st.set_page_config(
 st.title("BERT Sentiment Classification")
 st.markdown("Analyze customer feedback sentiment using fine-tuned BERT model")
 
-GOOGLE_DRIVE_FILE_ID = "https://drive.google.com/file/d/1enEXsicThfeOyXIiwfjN0WXeB5LeYKAt/view?usp=sharing"
+GOOGLE_DRIVE_FILE_ID = "1enEXsicThfeOyXIiwfjN0WXeB5LeYKAt"
 MODEL_PATH = "bert_sentiment_model"
 MODEL_ZIP = "bert_sentiment_model.zip"
 
@@ -28,7 +28,7 @@ def download_model_from_drive():
         st.info("Downloading model from Google Drive...")
         try:
             gdown.download(
-                f"{GOOGLE_DRIVE_FILE_ID}",
+                f"https://drive.google.com/uc?id={GOOGLE_DRIVE_FILE_ID}",
                 MODEL_ZIP,
                 quiet=False
             )
