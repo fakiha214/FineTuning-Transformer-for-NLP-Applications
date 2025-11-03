@@ -28,7 +28,7 @@ def download_model_from_drive():
         st.info("Downloading model from Google Drive...")
         try:
             gdown.download(
-                f"https://drive.google.com/uc?id={GOOGLE_DRIVE_FILE_ID}",
+                f"{GOOGLE_DRIVE_FILE_ID}",
                 MODEL_ZIP,
                 quiet=False
             )
