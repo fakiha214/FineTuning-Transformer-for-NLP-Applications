@@ -82,14 +82,23 @@ def predict_sentiment(text, model, tokenizer, device):
             probabilities = torch.softmax(logits, dim=1)
             pred_label = torch.argmax(logits, dim=1).item()
 
-        sentiment_labels = ['Negative', 'Neutral', 'Positive']
+        # Check number of output classes
+        num_classes = logits.shape[1]
+
+        if num_classes == 2:
+            sentiment_labels = ['Negative', 'Positive']
+            probs_array = probabilities[0].cpu().numpy()
+        else:
+            sentiment_labels = ['Negative', 'Neutral', 'Positive']
+            probs_array = probabilities[0].cpu().numpy()
+
         sentiment = sentiment_labels[pred_label]
         confidence = probabilities[0][pred_label].item()
 
-        return sentiment, confidence, probabilities[0].cpu().numpy()
+        return sentiment, confidence, probs_array, num_classes
     except Exception as e:
         st.error(f"Error during prediction: {e}")
-        return None, None, None
+        return None, None, None, None
 
 st.sidebar.header("Configuration")
 st.sidebar.markdown("### Setup Instructions")
@@ -139,29 +148,42 @@ if user_input:
 
             if result[0] is not None:
                 model, tokenizer, device = result
-                sentiment, confidence, probabilities = predict_sentiment(
+                sentiment, confidence, probabilities, num_classes = predict_sentiment(
                     user_input, model, tokenizer, device
                 )
 
                 if sentiment:
                     st.success(f"Sentiment: **{sentiment}** (Confidence: {confidence:.2%})")
 
-                    col1, col2, col3 = st.columns(3)
+                    if num_classes == 2:
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.metric("Negative", f"{probabilities[0]:.2%}")
+                        with col2:
+                            st.metric("Positive", f"{probabilities[1]:.2%}")
 
-                    with col1:
-                        st.metric("Negative", f"{probabilities[0]:.2%}")
-                    with col2:
-                        st.metric("Neutral", f"{probabilities[1]:.2%}")
-                    with col3:
-                        st.metric("Positive", f"{probabilities[2]:.2%}")
+                        st.markdown("---")
+                        st.subheader("Confidence Breakdown")
+                        chart_data = pd.DataFrame({
+                            'Sentiment': ['Negative', 'Positive'],
+                            'Confidence': probabilities
+                        })
+                    else:
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.metric("Negative", f"{probabilities[0]:.2%}")
+                        with col2:
+                            st.metric("Neutral", f"{probabilities[1]:.2%}")
+                        with col3:
+                            st.metric("Positive", f"{probabilities[2]:.2%}")
 
-                    st.markdown("---")
+                        st.markdown("---")
+                        st.subheader("Confidence Breakdown")
+                        chart_data = pd.DataFrame({
+                            'Sentiment': ['Negative', 'Neutral', 'Positive'],
+                            'Confidence': probabilities
+                        })
 
-                    st.subheader("Confidence Breakdown")
-                    chart_data = pd.DataFrame({
-                        'Sentiment': ['Negative', 'Neutral', 'Positive'],
-                        'Confidence': probabilities
-                    })
                     st.bar_chart(chart_data.set_index('Sentiment'))
 
 st.markdown("---")
