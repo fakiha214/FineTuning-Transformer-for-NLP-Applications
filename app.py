@@ -17,7 +17,7 @@ st.set_page_config(
 st.title("BERT Sentiment Classification")
 st.markdown("Analyze customer feedback sentiment using fine-tuned BERT model")
 
-GOOGLE_DRIVE_FILE_ID = "YOUR_GOOGLE_DRIVE_FILE_ID_HERE"
+GOOGLE_DRIVE_FILE_ID = "https://drive.google.com/file/d/1enEXsicThfeOyXIiwfjN0WXeB5LeYKAt/view?usp=sharing"
 MODEL_PATH = "bert_sentiment_model"
 MODEL_ZIP = "bert_sentiment_model.zip"
 
